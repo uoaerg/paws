@@ -1,0 +1,98 @@
+Function ExtractDomain(ArrayList, input_s)
+
+Dim return_original
+Dim s
+
+Dim IsHttp
+Dim IsPort
+
+' init
+return_original = False
+s = input_s
+
+
+IsHttp = InStr(s, "http")
+If IsHttp = 0 Then
+    IsPort = InStr(s, ":")
+    If IsPort = 0 Then
+        return_original = True
+        choice = 0
+    Else
+        choice = 1
+        s = Left(s, IsPort - 1)
+    End If
+Else
+    choice = 1
+    ' remove http//
+    s = Right(s, Len(s) - 7)
+    ' remove every thing after 1st /
+    IsSlash = InStr(s, "/")
+    If IsSlash <> 0 Then
+        s = Left(s, IsSlash - 1)
+    End If
+End If
+
+
+
+Select Case choice
+
+Case 1
+
+    'init
+    s_reversed = StrReverse(s)
+    out_loop = True
+    stop_pos = 0
+    fst_unknown_domain = True
+    
+    Do While out_loop
+    
+        ' find the domain
+        dot_pos = InStr(s_reversed, ".")
+        If dot_pos = 0 Then
+            return_original = True
+            Exit Do
+        End If
+        Domain = StrReverse(Left(s_reversed, dot_pos - 1))
+        stop_pos = stop_pos + dot_pos
+        
+        
+        ' init
+        redo = False
+        
+        ' compare it with the list of domain
+        For Each element In ArrayList
+            If element = Domain Then
+                fst_unknown_domain = False
+                redo = True
+                Exit For '(exit loop)
+            End If
+         Next element
+         
+        ' return original if first domain unknown
+        If fst_unknown_domain Then
+            return_original = True
+            Exit Do
+        End If
+    
+        ' try and find next domain in list or not
+        If redo Then
+            s_reversed = Right(s_reversed, Len(s_reversed) - dot_pos)
+        Else
+            out_loop = False
+        End If
+            
+    Loop
+    
+End Select
+
+
+If return_original Then
+    output = s
+Else
+    output = Right(s, stop_pos - 1)
+End If
+
+
+ExtractDomain = output
+
+End Function

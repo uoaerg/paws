@@ -1,0 +1,7 @@
+
+AuthName "Rural PAWS Manager" 
+AuthType Basic 
+AuthUserFile /var/www/manager/.htpasswd 
+AuthGroupFile /dev/null 
+require valid-user
+
